@@ -64,11 +64,11 @@ public class MainFragment extends Fragment implements DotView.OnDotViewPressList
         dotView = rootView.findViewById(R.id.dotview);
         Button btnRandom = rootView.findViewById(R.id.random_button);
         Button btnClear = rootView.findViewById(R.id.clear_button);
-        Button btnShare = rootView.findViewById(R.id.share_button);
+
         dotView.setOnDotViewPressListener(this);
         btnRandom.setOnClickListener(this);
         btnClear.setOnClickListener(this);
-        btnShare.setOnClickListener(this);
+
     }
 
     public void onRandomDot(View view) {
@@ -111,8 +111,9 @@ public class MainFragment extends Fragment implements DotView.OnDotViewPressList
             case R.id.random_button:
                 onRandomDot(view);
                 break;
-            case R.id.share_button:
+            default:
                 break;
         }
     }
+
 }

@@ -63,8 +63,9 @@ public class DotView extends View{
             case MotionEvent.ACTION_DOWN:
                 this.onDotViewPressListener.onDotViewPressed((int)event.getX(), (int)event.getY());
                 return true;
+            default:
+                return false;
         }
-        return false;
     }
 }
 
