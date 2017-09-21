@@ -1,10 +1,9 @@
 package kmitl.lab05.paniti58070080.simplemydot.model;
 
-/**
- * Created by pamai on 9/19/2017.
- */
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Dot {
+public class Dot implements Parcelable{
     private int centerX;
     private int centerY;
     private int radius;
@@ -15,6 +14,18 @@ public class Dot {
     }
 
     public OnDotChangedListener listener;
+
+    public static final Creator<Dot> CREATOR = new Creator<Dot>() {
+        @Override
+        public Dot createFromParcel(Parcel in) {
+            return new Dot(in);
+        }
+
+        @Override
+        public Dot[] newArray(int size) {
+            return new Dot[size];
+        }
+    };
 
     public void setListener(OnDotChangedListener listener) {
         this.listener = listener;
@@ -76,4 +87,25 @@ public class Dot {
     public void setColor(int color) {
         this.color = color;
     }
+
+    protected Dot(Parcel in) {
+        centerX = in.readInt();
+        centerY = in.readInt();
+        radius = in.readInt();
+        color = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(centerX);
+        parcel.writeInt(centerY);
+        parcel.writeInt(radius);
+        parcel.writeInt(color);
+    }
+
 }

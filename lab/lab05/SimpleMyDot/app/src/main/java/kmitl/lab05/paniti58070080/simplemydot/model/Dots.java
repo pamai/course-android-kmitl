@@ -1,20 +1,55 @@
 package kmitl.lab05.paniti58070080.simplemydot.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Dots {
-    private LinkedList<Dot> MoreDot = new LinkedList<>();
+public class Dots implements Parcelable{
+
+    private ArrayList<Dot> MoreDot = new ArrayList<>();
+    private OnDotsChangeListener listener;
+
+    public Dots(Dots.OnDotsChangeListener dotChangedListener) {
+        this.listener = dotChangedListener;
+    }
+
+    protected Dots(Parcel in) {
+        MoreDot = in.createTypedArrayList(Dot.CREATOR);
+    }
+
+    public static final Creator<Dots> CREATOR = new Creator<Dots>() {
+        @Override
+        public Dots createFromParcel(Parcel in) {
+            return new Dots(in);
+        }
+
+        @Override
+        public Dots[] newArray(int size) {
+            return new Dots[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+    }
 
     public interface OnDotsChangeListener{
         void onDotsChanged(Dots dots);
     }
-    private OnDotsChangeListener listener;
+
 
     public void setListener(OnDotsChangeListener listener){
         this.listener = listener;
     }
 
-    public LinkedList<Dot> getAllDot(){
+    public ArrayList<Dot> getAllDot(){
         return MoreDot;
     }
 
@@ -44,4 +79,5 @@ public class Dots {
         MoreDot.remove(index);
         this.listener.onDotsChanged(this);
     }
+
 }
