@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ChangeLayout"
+        android:title="ChangeLayout" />
+    <item
+        android:id="@+id/ChangeUser"
+        android:title="ChangeUser" >
+        <menu>
+            <item
+                android:id="@+id/user_android"
+                android:title="android" />
+            <item
+                android:id="@+id/user_nature"
+                android:title="nature" />
+            <item
+                android:id="@+id/user_cartoon"
+                android:title="cartoon" />
+        </menu>
+    </item>
+</menu>
