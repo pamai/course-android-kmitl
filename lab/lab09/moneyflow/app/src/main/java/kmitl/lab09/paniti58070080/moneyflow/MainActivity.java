@@ -1,16 +1,21 @@
 package kmitl.lab09.paniti58070080.moneyflow;
 
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +32,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MoneyDB moneyDB;
     private ArrayList<HashMap<String, String>> list;
     private List<MoneyInfo> data;
+    private int moneyIn = 0;
+    private int moneyOut = 0;
+    private int money = 0;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        builder = new AlertDialog.Builder(this);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add("Edit");
+        arrayAdapter.add("Delete");
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.dismiss();
+            }
+        });
 
         moneyDB = Room.databaseBuilder(getApplicationContext(), MoneyDB.class, "money").allowMainThreadQueries()
                 .build();
@@ -45,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             protected List<MoneyInfo> doInBackground(Void... voids) {
                 List<MoneyInfo> result  = moneyDB.moneyInfoDAO().queryAll();
-                Log.d("a", "test xD");
                 return result;
             }
 
@@ -59,21 +79,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     temp.put(SECOND_COLUMN, data.get(i).getDetail());
                     temp.put(THIRD_COLUMN, Integer.toString(data.get(i).getMoney()));
                     list.add(temp);
+                    if (data.get(i).getType().equals("+")){
+                        moneyIn += data.get(i).getMoney();
+                    }
+                    else {
+                        moneyOut += data.get(i).getMoney();
+                    }
                 }
-                Log.d("a", data.get(0).getType());
-                Log.d("a", data.get(0).getDetail());
-                Log.d("a", Integer.toString(data.get(0).getMoney()));
+                money = moneyIn - moneyOut;
+                TextView moneyView = findViewById(R.id.moneyView);
+                if (data.size() == 0){
+                    moneyView.setTextColor(Color.rgb(0, 0, 0));
+                }
+                else if (money > (moneyIn * 0.5)){
+                    moneyView.setTextColor(Color.rgb(0, 255, 0));
+                }
+                else if (money >= (moneyIn * 0.25)){
+                    moneyView.setTextColor(Color.rgb(255, 255, 0));
+                }
+                else {
+                    moneyView.setTextColor(Color.rgb(255, 0, 0));
+                }
+                moneyView.setText("เงินคงเหลือ\n"+Integer.toString(money));
                 listView.invalidateViews();
             }
         }.execute();
 
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id)
-            {
-                int pos=position;
-                Log.d("a", Integer.toString(pos));
+            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+
+                builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0){
+                            Intent intent = new Intent(getApplicationContext(), AddActivity.class);
+                            intent.putExtra("position", position);
+                            startActivity(intent);
+                        }
+                        else {
+                            new AsyncTask<Void, Void, List<MoneyInfo>>(){
+                                @Override
+                                protected List<MoneyInfo> doInBackground(Void... voids) {
+                                    List<MoneyInfo> result  = moneyDB.moneyInfoDAO().queryAll();
+                                    return result;
+                                }
+
+                                @Override
+                                protected void onPostExecute(List<MoneyInfo> moneyInfo) {
+                                    Log.d("delete", "delete");
+                                    moneyDB.moneyInfoDAO().delete(moneyInfo.get(position).getId());
+                                    Intent intent = getIntent();
+                                    overridePendingTransition(0, 0);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                                    finish();
+                                    overridePendingTransition(0, 0);
+                                    startActivity(intent);
+                                }
+                            }.execute();
+                        }
+
+                    }
+                });
+                builder.show();
+
             }
 
         });
